@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Smart Exam Practice
 
-## Getting Started
+Next.js App Router foundation for account registration, sign-in, profile management, and a responsive learning dashboard.
 
-First, run the development server:
+### Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install Node.js 20.9 or newer.
+2. Copy `.env.example` to `.env.local`.
+3. Set `MONGODB_URI` to a rotated MongoDB credential with access to the cluster. The direct-seed format in `.env.example` avoids SRV DNS lookups on networks where Node cannot resolve them. Keep `MONGODB_DB=SmartExamPractice` and `MONGODB_COLLECTION=users`.
+4. Set `SESSION_SECRET` to a private random value of at least 32 characters. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`.
+5. Run `npm install`, then `npm run dev` and open `http://localhost:3000`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The MongoDB account needs read/write access to the `users` collection and permission to create its unique username/email indexes. Environment files are ignored by Git.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/register` creates a user and immediately starts a session.
+- `/login` accepts a username or email.
+- `/dashboard` and `/profile` require an active session.
+- `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`, and `/api/profile` provide the server-side API.
 
-## Learn More
+The session is an HMAC-signed, HTTP-only cookie. Passwords are stored as bcrypt hashes. Learning modules remain empty placeholders until their data and workflows are implemented.
 
-To learn more about Next.js, take a look at the following resources:
+### Checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run `npx tsc --noEmit`, `npm run lint`, and `npm run build` before deployment.
