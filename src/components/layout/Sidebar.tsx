@@ -14,7 +14,7 @@ const groups = [
   {
     label: "Question Bank",
     icon: "bi-question-circle",
-    children: [{ label: "Questions", href: "/questions" }, { label: "Hard Words", href: "/hard-words" }],
+    children: [{ label: "Questions", href: "/question-bank" }, { label: "Hard Words", href: "/hard-words" }],
   },
   {
     label: "Practice",
@@ -30,10 +30,15 @@ const groups = [
   { label: "Settings", icon: "bi-gear", href: "/settings" },
 ];
 
+function isCurrentRoute(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () => void }) {
   const pathname = usePathname();
-  const activeGroup = groups.find((group) => group.children?.some((item) => item.href === pathname))?.label;
+  const activeGroup = groups.find((group) => group.children?.some((item) => isCurrentRoute(pathname, item.href)))?.label;
   const [expanded, setExpanded] = useState<string | null>(activeGroup ?? null);
+  const [collapsedPath, setCollapsedPath] = useState<string | null>(null);
 
   return (
     <>
@@ -42,20 +47,30 @@ export default function Sidebar({ open, onNavigate }: { open: boolean; onNavigat
         <div className="sidebar-section-label">LEARNING SPACE</div>
         <nav className="sidebar-nav">
           {groups.map((group) => {
-            const childActive = group.children?.some((item) => item.href === pathname) ?? false;
-            const active = group.href === pathname || childActive;
+            const childActive = group.children?.some((item) => isCurrentRoute(pathname, item.href)) ?? false;
+            const active = Boolean(group.href && isCurrentRoute(pathname, group.href)) || childActive;
             if (group.children) {
-              const isExpanded = expanded === group.label;
+              const isExpanded = activeGroup
+                ? collapsedPath === pathname ? expanded === group.label : activeGroup === group.label
+                : expanded === group.label;
               return (
                 <div className={`nav-group${active ? " is-active-group" : ""}`} key={group.label}>
-                  <button className={`sidebar-link${active ? " active" : ""}`} onClick={() => setExpanded(isExpanded ? null : group.label)} aria-expanded={isExpanded}>
+                  <button className={`sidebar-link${active ? " active" : ""}`} onClick={() => {
+                    if (isExpanded) {
+                      setExpanded(null);
+                      setCollapsedPath(pathname);
+                    } else {
+                      setExpanded(group.label);
+                      setCollapsedPath(activeGroup ? pathname : null);
+                    }
+                  }} aria-expanded={isExpanded}>
                     <i className={`bi ${group.icon}`} aria-hidden="true" />
                     <span>{group.label}</span>
                     <i className={`bi ${isExpanded ? "bi-chevron-down" : "bi-chevron-right"} nav-chevron`} aria-hidden="true" />
                   </button>
                   <div className={`submenu${isExpanded ? " expanded" : ""}`}>
                     {group.children.map((item) => (
-                      <Link className={`submenu-link${pathname === item.href ? " active" : ""}`} href={item.href} key={item.href} onClick={onNavigate}>
+                      <Link className={`submenu-link${isCurrentRoute(pathname, item.href) ? " active" : ""}`} href={item.href} key={item.href} onClick={onNavigate}>
                         <span className="submenu-dot" />{item.label}
                       </Link>
                     ))}

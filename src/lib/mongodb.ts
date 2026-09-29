@@ -1,4 +1,4 @@
-import { MongoClient, type Collection } from "mongodb";
+import { MongoClient, type Collection, type Document } from "mongodb";
 import type { UserDocument } from "@/types/user";
 
 const uri = process.env.MONGODB_URI;
@@ -25,7 +25,11 @@ function getClientPromise() {
   return global.mongoClientPromise;
 }
 
-export async function getUsersCollection(): Promise<Collection<UserDocument>> {
+export async function getCollection<T extends Document>(name: string): Promise<Collection<T>> {
   const client = await getClientPromise();
-  return client.db(dbName).collection<UserDocument>(collectionName);
+  return client.db(dbName).collection<T>(name);
+}
+
+export async function getUsersCollection(): Promise<Collection<UserDocument>> {
+  return getCollection<UserDocument>(collectionName);
 }
