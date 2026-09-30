@@ -15,7 +15,7 @@ export default function AppLayout({ user, children }: { user: PublicUser; childr
     <div className="app-frame">
       <Header user={user} onMenuClick={() => setMobileNavOpen(true)} />
       <div className="app-body">
-        <Sidebar open={mobileNavOpen} onNavigate={closeNav} />
+        <Sidebar open={mobileNavOpen} role={user.role} onNavigate={closeNav} />
         <main className="app-main">{children}<Footer /></main>
       </div>
     </div>
