@@ -4,6 +4,7 @@ import { unauthorized } from "@/lib/api-response";
 import { getCurrentUser } from "@/lib/auth";
 import { deactivateChapter, getChapterDetails, parseObjectId, updateChapter } from "@/services/academic-service";
 import { getChapterQuestionCounts } from "@/services/question-service";
+import { getChapterVariantCount } from "@/services/question-variant-service";
 import type { AcademicStatus } from "@/types/academics";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -17,8 +18,11 @@ export async function GET(_request: Request, { params }: RouteContext) {
     if (!chapterId) return invalidRequest("The chapter ID is invalid.");
     const details = await getChapterDetails(user._id, chapterId);
     if (!details) return NextResponse.json({ error: "Chapter not found." }, { status: 404 });
-    const questionCounts = await getChapterQuestionCounts(user._id, chapterId);
-    return NextResponse.json({ ...details, questionCounts });
+    const [questionCounts, variantCount] = await Promise.all([
+      getChapterQuestionCounts(user._id, chapterId),
+      getChapterVariantCount(user._id, chapterId),
+    ]);
+    return NextResponse.json({ ...details, questionCounts, variantCount });
   } catch (error) {
     return academicFailure(error);
   }
@@ -54,8 +58,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
       updates.chapterNumber = value;
     }
     if ("description" in body) {
-      const value = stringField(body, "description", 1000);
-      if (value === null) return invalidRequest("Description must be 1000 characters or fewer.");
+      const value = stringField(body, "description");
+      if (value === null) return invalidRequest("Description must be text.");
       updates.description = value;
     }
     if ("displayOrder" in body) {

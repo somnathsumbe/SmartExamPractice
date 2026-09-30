@@ -255,6 +255,12 @@ export async function getVariantCountsByQuestions(userId: ObjectId, questionIds:
   return counts;
 }
 
+export async function getChapterVariantCount(userId: ObjectId, chapterId: ObjectId) {
+  await ensureQuestionVariantIndexes();
+  const variants = await getCollection<QuestionVariantDocument>(collectionName);
+  return variants.countDocuments({ userId, chapterId });
+}
+
 export async function getQuestionVariantSummaries(userId: ObjectId, questionId: ObjectId) {
   await verifyParent(userId, questionId);
   await ensureQuestionVariantIndexes();

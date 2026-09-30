@@ -15,7 +15,7 @@ export async function readRequestObject(request: Request) {
   }
 }
 
-export function stringField(body: Record<string, unknown>, field: string, maxLength: number, required = false) {
+export function stringField(body: Record<string, unknown>, field: string, maxLength = Number.MAX_SAFE_INTEGER, required = false) {
   const value = body[field];
   if (value === undefined && !required) return "";
   if (typeof value !== "string") return null;

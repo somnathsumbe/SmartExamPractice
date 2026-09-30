@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const subjectId = subjectValue ? parseObjectId(subjectValue) : null;
     const name = stringField(body, "name", 120, true);
     const className = stringField(body, "className", 80, true);
-    const description = stringField(body, "description", 1000);
+    const description = stringField(body, "description");
     const chapterNumber = integerField(body, "chapterNumber", 1);
     const displayOrder = integerField(body, "displayOrder");
     const status = statusField(body);

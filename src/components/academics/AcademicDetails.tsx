@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AcademicFormDialog, { type SubjectChoice } from "@/components/academics/AcademicFormDialog";
 import AcademicConfirmDialog from "@/components/academics/AcademicConfirmDialog";
 import AcademicLoading from "@/components/academics/AcademicLoading";
+import ChapterLearningSections from "@/components/academics/ChapterLearningSections";
 import { AcademicStatusBadge } from "@/components/academics/AcademicLists";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
@@ -15,7 +16,7 @@ import type { ChapterDetails, SubjectRecord } from "@/components/academics/types
 type ApiData = { error?: string } & Record<string, unknown>;
 type Notice = { tone: "danger" | "success"; message: string };
 type SubjectDetails = { subject: SubjectRecord; chapterCount: number; chapters: ChapterDetails[] };
-type ChapterResponse = { chapter: ChapterDetails; subject: SubjectChoice; questionCounts?: { total: number; active: number; inactive: number } };
+type ChapterResponse = { chapter: ChapterDetails; subject: SubjectChoice; questionCounts?: { total: number; active: number; inactive: number }; variantCount?: number };
 
 async function requestJson<T extends ApiData>(url: string, init?: RequestInit): Promise<T> {
   let response: Response;
@@ -214,10 +215,9 @@ export function ChapterDetailPage({ id }: { id: string }) {
             <div className="academic-definition-wide"><dt>Description</dt><dd>{details.chapter.description || "No description provided."}</dd></div>
           </dl>
         </section>
+        <ChapterLearningSections chapterId={details.chapter._id} subjectId={details.subject._id} />
         <section className="academic-future-grid" aria-label="Chapter learning modules">
-          <article className="academic-future-card"><div><p className="eyebrow">LEARNING</p><h2>Learning Content</h2><p>Add chapter learning material later.</p></div><span className="academic-coming-soon">Coming Soon</span></article>
-          <article className="academic-future-card question-bank-card"><div><p className="eyebrow">QUESTIONS</p><h2>Question Bank</h2>{details.questionCounts?.total ? <p>Total Questions: {details.questionCounts.total}<br />Active: {details.questionCounts.active} · Inactive: {details.questionCounts.inactive}</p> : <p>No questions created for this chapter yet.</p>}</div><div className="question-bank-card-actions"><Link className="btn btn-outline-secondary" href={`/question-bank?subjectId=${details.subject._id}&chapterId=${details.chapter._id}`}>View Questions</Link><Link className="btn btn-primary app-primary-button" href={`/question-bank/new?subjectId=${details.subject._id}&chapterId=${details.chapter._id}`}><i className="bi bi-plus-lg" aria-hidden="true" /> Add Question</Link></div></article>
-          <article className="academic-future-card"><div><p className="eyebrow">VOCABULARY</p><h2>Hard Words</h2><p>Important difficult words for this chapter.</p></div><span className="academic-coming-soon">Coming Soon</span></article>
+          <article className="academic-future-card question-bank-card"><div><p className="eyebrow">QUESTIONS</p><h2>Question Bank</h2><p>Total Questions: {details.questionCounts?.total ?? 0}<br />Active: {details.questionCounts?.active ?? 0} · Inactive: {details.questionCounts?.inactive ?? 0}<br />Variants: {details.variantCount ?? 0}</p></div><div className="question-bank-card-actions"><Link className="btn btn-outline-secondary" href={`/question-bank?subjectId=${details.subject._id}&chapterId=${details.chapter._id}`}>View Questions</Link><Link className="btn btn-primary app-primary-button" href={`/question-bank/new?subjectId=${details.subject._id}&chapterId=${details.chapter._id}`}><i className="bi bi-plus-lg" aria-hidden="true" /> Add Question</Link></div></article>
           <article className="academic-future-card"><div><p className="eyebrow">PRACTICE</p><h2>Practice</h2><p>Practice tests for this chapter.</p></div><button className="btn btn-outline-secondary" type="button" disabled title="Coming soon">Practice Chapter</button></article>
           <article className="academic-future-card"><div><p className="eyebrow">PROGRESS</p><h2>Performance</h2><p>Chapter performance will appear here after practice.</p></div><span className="academic-coming-soon">Coming Soon</span></article>
         </section>

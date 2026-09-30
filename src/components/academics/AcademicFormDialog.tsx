@@ -95,7 +95,7 @@ export default function AcademicFormDialog({ kind, initial, subjects = [], locke
               </div>
               <div className="academic-field academic-field-wide">
                 <label className="form-label" htmlFor="academic-description">Description</label>
-                <textarea className="form-control" id="academic-description" name="description" defaultValue={initial?.description ?? ""} maxLength={1000} rows={3} />
+                <textarea className="form-control" id="academic-description" name="description" defaultValue={initial?.description ?? ""} rows={3} />
               </div>
             </>
           )}
